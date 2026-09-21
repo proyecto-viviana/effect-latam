@@ -561,17 +561,16 @@
 
 .home-install {
   display: grid;
-  grid-template-columns: auto 1fr auto;
+  grid-template-columns: auto minmax(0, 1fr);
   width: min(36rem, 100%);
   min-height: 3.25rem;
-  align-items: center;
+  align-items: stretch;
   margin-top: 2rem;
   border: 1px solid var(--color-border-strong);
   border-radius: var(--radius-md);
   background: color-mix(in oklab, var(--color-background) 92%, transparent);
   padding: 0.25rem;
   color: var(--color-muted-strong);
-  cursor: pointer;
   font-family: var(--font-mono) !important;
   text-align: left;
   transition:
@@ -585,13 +584,42 @@
 }
 
 .home-install__manager {
-  display: inline-flex;
-  align-self: stretch;
-  align-items: center;
+  appearance: none;
+  border: 0;
   border-right: 1px solid var(--color-border);
-  padding-inline: 0.8rem;
+  border-radius: 0;
+  background: transparent
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' fill='none' stroke='%23a1a1aa' stroke-width='1.5'%3E%3Cpath d='M1 1l4 4 4-4'/%3E%3C/svg%3E")
+    no-repeat right 0.7rem center;
+  padding: 0 1.9rem 0 0.8rem;
   color: var(--color-foreground);
+  cursor: pointer;
+  font-family: inherit;
   font-size: 0.6875rem;
+}
+
+.home-install__manager option {
+  background: var(--color-background);
+  color: var(--color-foreground);
+}
+
+.home-install__command {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  border: 0;
+  background: transparent;
+  padding: 0;
+  color: inherit;
+  cursor: pointer;
+  font-family: inherit;
+  text-align: left;
+}
+
+.home-install__manager:focus-visible,
+.home-install__command:focus-visible {
+  outline: 2px solid var(--color-foreground);
+  outline-offset: 2px;
 }
 
 .home-install code {

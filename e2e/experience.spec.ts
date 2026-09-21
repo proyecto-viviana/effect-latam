@@ -225,3 +225,17 @@ test("Portuguese readers start in Portuguese; the flag toggle switches and persi
   await expect(page.getByRole("heading", { level: 1 })).not.toContainText("Fóruns");
   await context.close();
 });
+
+test("the install command follows the chosen package manager", async ({ page }) => {
+  await hydrated(page, "/");
+  const command = page.getByTestId("install").locator("code");
+  await expect(command).toHaveText("pnpm add effect@rc");
+  await page.getByTestId("install-manager").selectOption("npm");
+  await expect(command).toHaveText("npm install effect@rc");
+  await expect(page.getByTestId("install-copy")).toHaveAccessibleName(
+    "Copiar npm install effect@rc",
+  );
+
+  await hydrated(page, "/");
+  await expect(command).toHaveText("npm install effect@rc");
+});

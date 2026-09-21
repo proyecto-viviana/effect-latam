@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/solid-router";
-import { createSignal, onCleanup } from "solid-js";
+import { For, createSignal, onCleanup, onSettled } from "solid-js";
 import { CommunityAtlas } from "../components/CommunityAtlas";
 import { LinkButton } from "../components/ui";
 import { routeHead } from "../lib/seo";
@@ -17,6 +17,7 @@ const copy = {
     lead: "Aprendé Effect construyendo. Siete labs ejecutables, artículos honestos y una comunidad latinoamericana para razonar sobre errores, servicios y concurrencia.",
     copied: "Comando copiado",
     copyCommand: "Copiar",
+    packageManager: "Gestor de paquetes",
     copyFailed: "No se pudo copiar; seleccioná el comando.",
     included: "// Incluido en el recorrido",
     contents: "Contenido disponible",
@@ -71,6 +72,7 @@ const copy = {
     lead: "Aprenda Effect construindo. Sete labs executáveis, artigos honestos e uma comunidade latino-americana para raciocinar sobre erros, serviços e concorrência.",
     copied: "Comando copiado",
     copyCommand: "Copiar",
+    packageManager: "Gerenciador de pacotes",
     copyFailed: "Não foi possível copiar; selecione o comando.",
     included: "// Incluído no percurso",
     contents: "Conteúdo disponível",
@@ -121,17 +123,51 @@ const copy = {
   },
 };
 
+const INSTALL_COMMANDS = {
+  pnpm: "pnpm add effect@rc",
+  npm: "npm install effect@rc",
+  yarn: "yarn add effect@rc",
+  bun: "bun add effect@rc",
+  deno: "deno add npm:effect@rc",
+} as const;
+type PackageManager = keyof typeof INSTALL_COMMANDS;
+const MANAGERS = Object.keys(INSTALL_COMMANDS) as PackageManager[];
+const MANAGER_KEY = "el_package_manager";
+
 function LandingPage() {
   const t = useCopy(copy);
-  const installCommand = "pnpm add effect@rc";
+  const [manager, setManager] = createSignal<PackageManager>("pnpm");
+  const installCommand = () => INSTALL_COMMANDS[manager()];
   const [copyState, setCopyState] = createSignal<"idle" | "copied" | "failed">("idle");
   let copyReset: ReturnType<typeof setTimeout> | undefined;
 
   onCleanup(() => clearTimeout(copyReset));
 
+  // The server always renders pnpm; a remembered choice applies after hydration.
+  onSettled(() => {
+    try {
+      const saved = localStorage.getItem(MANAGER_KEY);
+      if (saved && saved in INSTALL_COMMANDS) setManager(saved as PackageManager);
+    } catch {
+      /* Storage can be blocked; pnpm stays selected. */
+    }
+  });
+
+  function chooseManager(next: string) {
+    if (!(next in INSTALL_COMMANDS)) return;
+    setManager(next as PackageManager);
+    setCopyState("idle");
+    try {
+      localStorage.setItem(MANAGER_KEY, next);
+    } catch {
+      /* The choice still holds for this visit. */
+    }
+  }
+
   // Kept out of the JSX: a ternary with call branches hydrates under a different key.
   const installLabel = () =>
-    copyState() === "copied" ? t().copied : `${t().copyCommand} ${installCommand}`;
+    copyState() === "copied" ? t().copied : `${t().copyCommand} ${installCommand()}`;
+  const copyIcon = () => (copyState() === "copied" ? "✓" : "⧉");
   const installStatus = () =>
     copyState() === "copied" ? t().copied : copyState() === "failed" ? t().copyFailed : "";
 
@@ -139,11 +175,11 @@ function LandingPage() {
     let didCopy = false;
 
     try {
-      await navigator.clipboard.writeText(installCommand);
+      await navigator.clipboard.writeText(installCommand());
       didCopy = true;
     } catch {
       const fallback = document.createElement("textarea");
-      fallback.value = installCommand;
+      fallback.value = installCommand();
       fallback.setAttribute("readonly", "");
       fallback.style.position = "fixed";
       fallback.style.opacity = "0";
@@ -174,18 +210,29 @@ function LandingPage() {
           </h1>
           <p class="home-hero__lead">{t().lead}</p>
 
-          <button
-            class="home-install"
-            type="button"
-            aria-label={installLabel()}
-            onClick={copyInstallCommand}
-          >
-            <span class="home-install__manager">pnpm</span>
-            <code>{installCommand}</code>
-            <span class="home-install__copy" aria-hidden="true">
-              {copyState() === "copied" ? "✓" : "⧉"}
-            </span>
-          </button>
+          <div class="home-install" data-testid="install">
+            <select
+              class="home-install__manager"
+              aria-label={t().packageManager}
+              value={manager()}
+              onChange={(event) => chooseManager(event.currentTarget.value)}
+              data-testid="install-manager"
+            >
+              <For each={MANAGERS}>{(name) => <option value={name}>{name}</option>}</For>
+            </select>
+            <button
+              class="home-install__command"
+              type="button"
+              aria-label={installLabel()}
+              onClick={copyInstallCommand}
+              data-testid="install-copy"
+            >
+              <code>{installCommand()}</code>
+              <span class="home-install__copy" aria-hidden="true">
+                {copyIcon()}
+              </span>
+            </button>
+          </div>
           <span class="home-install__status" role="status" aria-live="polite">
             {installStatus()}
           </span>

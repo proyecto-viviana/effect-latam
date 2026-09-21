@@ -1,0 +1,36 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "effect-latam",
+  "compatibility_date": "2026-08-31",
+  "compatibility_flags": ["nodejs_compat"],
+  "main": "src/server-entry.ts",
+  "workers_dev": false,
+  "preview_urls": false,
+  // Canonical public host (apex). The Worker redirects www to the apex.
+  "routes": [
+    { "pattern": "effectlatam.com", "custom_domain": true },
+    { "pattern": "www.effectlatam.com", "custom_domain": true },
+  ],
+  "observability": {
+    "enabled": true,
+    "head_sampling_rate": 1,
+  },
+  "secrets": {
+    "required": ["EFFECT_LATAM_CLIENT_SECRET", "EFFECT_LATAM_ADMIN_EMAILS"],
+  },
+  "vars": {
+    "APP_URL": "https://effectlatam.com",
+    "AUTH_URL": "https://auth.proyectoviviana.org",
+    "EFFECT_LATAM_CLIENT_ID": "effect-latam",
+    // Never enable on the public internet. Local override: `.dev.vars`.
+    "EFFECT_LATAM_DEV_AUTH": "0",
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "effect-latam-db",
+      "database_id": "223a6926-d96f-40bf-a703-d88a38c32b7c",
+      "migrations_dir": "drizzle",
+    },
+  ],
+}

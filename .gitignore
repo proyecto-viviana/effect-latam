@@ -1,0 +1,29 @@
+node_modules
+dist
+dist-ssr
+*.local
+.DS_Store
+.env
+.env.*
+!.env.example
+.dev.vars
+.dev.vars.*
+!.dev.vars.example
+coverage
+test-results
+playwright-report
+blob-report
+.playwright
+.playwright-cli
+output/playwright/app
+!output/playwright/app/README.md
+*.tsbuildinfo
+.vite
+.wrangler
+.tanstack
+.vite-hooks
+# Local durable community country list (Node dev; D1 later)
+.data
+
+# local agent receipts
+.agents/

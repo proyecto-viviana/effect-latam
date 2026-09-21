@@ -1,0 +1,4 @@
+# Copy to `.dev.vars` for local `vp dev` (never commit real secrets).
+EFFECT_LATAM_DEV_AUTH=1
+APP_URL=http://localhost:4177
+# EFFECT_LATAM_ADMIN_EMAILS=admin@example.com

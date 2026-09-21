@@ -85,15 +85,28 @@ const copy = {
   },
 };
 
+/** Scroll distance, in pixels, before the top chrome may hide. */
+const CHROME_HIDE_AFTER = 120;
+
 function RootComponent() {
   const location = useLocation();
   const t = useCopy(copy);
   const [me, setMe] = createSignal<Awaited<ReturnType<typeof fetchMe>>>();
   const [notifCount, setNotifCount] = createSignal(0);
   const [sessionError, setSessionError] = createSignal(false);
+  const [chromeHidden, setChromeHidden] = createSignal(false);
 
   onSettled(() => {
     document.documentElement.setAttribute("data-hydrated", "true");
+    let lastY = window.scrollY;
+    const onScroll = () => {
+      const y = window.scrollY;
+      // Ignore sub-pixel jitter so the chrome does not flicker.
+      if (Math.abs(y - lastY) < 4) return;
+      setChromeHidden(y > lastY && y > CHROME_HIDE_AFTER);
+      lastY = y;
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
     void fetchMe()
       .then((result) => {
         setMe(result);
@@ -125,7 +138,7 @@ function RootComponent() {
   const isActive = (href: string) => path() === href || path().startsWith(`${href}/`);
 
   return (
-    <div class="site-shell">
+    <div class="site-shell" data-chrome-hidden={chromeHidden() ? "" : undefined}>
       <a href="#main" class="skip-link">
         {t().skip}
       </a>

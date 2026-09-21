@@ -239,3 +239,13 @@ test("the install command follows the chosen package manager", async ({ page }) 
   await hydrated(page, "/");
   await expect(command).toHaveText("npm install effect@rc");
 });
+
+test("the header leaves on scroll down and returns on scroll up", async ({ page }) => {
+  await hydrated(page, "/");
+  const header = page.locator(".site-header");
+  await expect(header).toBeInViewport();
+  await page.evaluate(() => window.scrollTo(0, 900));
+  await expect(header).not.toBeInViewport();
+  await page.evaluate(() => window.scrollTo(0, 700));
+  await expect(header).toBeInViewport();
+});

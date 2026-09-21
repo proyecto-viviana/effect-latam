@@ -24,10 +24,6 @@ const copy = {
     articles: "4 artículos",
     forums: "foros",
     achievements: "logros",
-    communityEyebrow: "// Comunidad",
-    communityTitle: "Effect desde Latinoamérica",
-    communityLead:
-      "Registrá tu país, compartí lo que aprendiste y discutí los bordes difíciles con gente que también está construyendo.",
     topics: "Temas del recorrido",
     topicErrors: "Errores",
     topicConcurrency: "Concurrencia",
@@ -79,10 +75,6 @@ const copy = {
     articles: "4 artigos",
     forums: "fóruns",
     achievements: "conquistas",
-    communityEyebrow: "// Comunidade",
-    communityTitle: "Effect a partir da América Latina",
-    communityLead:
-      "Registre o seu país, compartilhe o que aprendeu e discuta as partes difíceis com gente que também está construindo.",
     topics: "Temas do percurso",
     topicErrors: "Erros",
     topicConcurrency: "Concorrência",
@@ -249,11 +241,6 @@ function LandingPage() {
         </div>
       </section>
 
-      <section class="home-community-intro" aria-labelledby="community-title">
-        <p class="home-eyebrow">{t().communityEyebrow}</p>
-        <h2 id="community-title">{t().communityTitle}</h2>
-        <p>{t().communityLead}</p>
-      </section>
       <CommunityAtlas />
 
       <nav class="home-topic-nav" aria-label={t().topics}>
